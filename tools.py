@@ -1,9 +1,12 @@
+import time
 from typing import Optional
 import os
 import base64
 import PyPDF2
 import fitz  # PyMuPDF
 from pydantic_ai import RunContext
+
+from pseudo_client import pseudo_waiting
 
 # dependency container passed to the agent
 class Deps:
@@ -106,7 +109,12 @@ async def do_experiment(
 
     msg = (f"✅ Experiment started: {reagent} at {spin_speed} rpm, "
            f"acc {spin_acc} rpm/s, duration {spin_dur} ms, volume {volume} µl.")
-    print(msg)
-
     await ctx.deps.send_event({"type": "tool_result", "name": "do_experiment", "result": msg})
+
+    while True:
+        if pseudo_waiting():
+            break
+
+    msg0 = ("✅ Experiment done")
+    await ctx.deps.send_event({"type": "tool_result", "name": "do_experiment", "result": msg0})
     return msg
