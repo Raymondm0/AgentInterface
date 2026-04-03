@@ -16,7 +16,9 @@ from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.deepseek import DeepSeekProvider
 from dotenv import load_dotenv
 
-import tools # agent tools
+# agent tools
+import tools
+import assistant
 
 load_dotenv()
 api_key = os.getenv("DEEPSEEK_API_KEY")
@@ -30,13 +32,14 @@ model = OpenAIChatModel(
 agent = Agent(
     model,
     system_prompt=(
-        "You are an experienced materials scientist. "
+        "You are an experienced materials scientist and leads a series of experiment projects. "
         "When the user uploads a PDF, you can read it with `read_pdf(file_path, page_number)`. "
         "The file path will be provided by the system. "
         "You may also run spin‑coating experiments with `do_experiment`."
+        "When you need help, you can ask the assistant. "
     ),
     deps_type=tools.Deps,
-    tools=[tools.read_pdf, tools.do_experiment],
+    tools=[tools.read_pdf, tools.do_experiment, assistant.call_assistant],
 )
 
 
